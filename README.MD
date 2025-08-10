@@ -380,6 +380,93 @@ docker exec ml-model-api ps aux
 
 **What this shows:** The output will be a list of all the processes running inside that specific container. If you started the container normally, you would expect to see the main `python` process that is running your Flask application.
 
+### Inside the Container: Systematic Investigation
+
+Once you have a shell inside the container, you become a detective. Here's a systematic approach to investigating issues:
+
+#### **Step 1: File System Inspection**
+```bash
+ls -lha
+```
+**Narration**: "Are the files I expect to be here actually here? Do they have the right permissions?"
+- Check for `app.py`, `model.joblib`, `requirements.txt`
+- Verify file sizes and timestamps
+- Look for permission issues (executable bits, ownership)
+
+#### **Step 2: Package Environment Verification**
+```bash
+pip list
+```
+**Narration**: "Let me check the installed package versions to see if they match requirements.txt."
+- Compare installed versions with `requirements.txt`
+- Look for missing dependencies
+- Check for version conflicts
+
+#### **Step 3: Environment Variables Check**
+```bash
+env
+```
+**Narration**: "Let me check the environment variables. Is the PYTHONPATH set correctly? Is a required API key or config path missing?"
+- Verify `PYTHONPATH` configuration
+- Check for missing environment variables
+- Look for configuration paths
+
+#### **Step 4: Manual Application Testing**
+```bash
+python app.py
+```
+**Narration**: "I'll try to run the application manually from the shell. This will give me a direct, interactive traceback if it crashes."
+- Get immediate Python error messages
+- See startup logs and error details
+- Identify import errors or runtime issues
+
+#### **Step 5: Internal Service Testing**
+```bash
+curl localhost:5000/predict -X POST -H "Content-Type: application/json" -d '{"features": [5.1,3.5,1.4,0.2]}'
+```
+**Narration**: "I'll test the service from inside the container to isolate whether it's an application problem or a Docker networking problem."
+- Confirms the Flask app is responding internally
+- Tests the prediction endpoint functionality
+- Eliminates port mapping issues from diagnosis
+
+#### **Complete Investigation Workflow**
+```bash
+# Enter container
+docker exec -it <container_id> /bin/sh
+
+# 1. File system check
+echo "=== File System Investigation ==="
+ls -lha
+ls -la /app
+
+# 2. Package verification  
+echo "=== Package Environment ==="
+pip list | grep -E "flask|sklearn|numpy|joblib"
+
+# 3. Environment check
+echo "=== Environment Variables ==="
+env | grep -E "PYTHON|PATH"
+
+# 4. Manual app test
+echo "=== Manual Application Test ==="
+python app.py &  # Run in background
+sleep 2          # Give it time to start
+
+# 5. Internal service test
+echo "=== Internal Service Test ==="
+curl localhost:5000/predict \
+     -X POST \
+     -H "Content-Type: application/json" \
+     -d '{"features": [5.1,3.5,1.4,0.2]}'
+```
+
+This systematic approach helps you quickly identify whether issues are:
+- **File-related**: Missing files, wrong permissions
+- **Dependency-related**: Package version mismatches
+- **Configuration-related**: Missing environment variables
+- **Application-related**: Python code errors
+- **Network-related**: Port mapping or service binding issues
+
 ### Troubleshooting Cheat Sheet
 
 | Issue | Container Test Command |

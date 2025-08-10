@@ -434,30 +434,26 @@ curl localhost:5000/predict -X POST -H "Content-Type: application/json" -d '{"fe
 # Enter container
 docker exec -it <container_id> /bin/sh
 
-# 1. File system check
-echo "=== File System Investigation ==="
-ls -lha
-ls -la /app
+# Step 1: Are the files I expect to be here actually here? Do they have the right permissions?
+ls -lha                    # Check your app.py, your model file, etc.
+ls -la /app               # Verify files in the working directory
 
-# 2. Package verification  
-echo "=== Package Environment ==="
-pip list | grep -E "flask|sklearn|numpy|joblib"
+# Step 2: Let me check the installed package versions to see if they match requirements.txt
+pip list                  # Compare with requirements.txt for version mismatches
+pip list | grep -E "flask|sklearn|numpy|joblib"  # Focus on key packages
 
-# 3. Environment check
-echo "=== Environment Variables ==="
-env | grep -E "PYTHON|PATH"
+# Step 3: Let me check the environment variables. Is the PYTHONPATH set correctly? Is a required API key or config path missing?
+env                       # Check all environment variables
+env | grep -E "PYTHON|PATH"  # Focus on Python-related variables
 
-# 4. Manual app test
-echo "=== Manual Application Test ==="
-python app.py &  # Run in background
-sleep 2          # Give it time to start
+# Step 4: Try to run the application manually from the shell. This will give you a direct, interactive traceback if it crashes.
+python app.py             # Manual startup - see immediate error messages
 
-# 5. Internal service test
-echo "=== Internal Service Test ==="
+# Step 5: I'll test the service from inside the container to isolate whether it's an application problem or a Docker networking problem.
 curl localhost:5000/predict \
      -X POST \
      -H "Content-Type: application/json" \
-     -d '{"features": [5.1,3.5,1.4,0.2]}'
+     -d '{"features": [5.1,3.5,1.4,0.2]}'  # Test internal service response
 ```
 
 This systematic approach helps you quickly identify whether issues are:

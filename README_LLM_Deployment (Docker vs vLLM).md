@@ -1,29 +1,31 @@
-# LLM Deployment Toolkit
+# 🚀 LLM Deployment Toolkit
 
-## Option 1: Bare Metal vLLM
-Best for:
+## 🎯 Option 1: Bare Metal vLLM
 
-✅ Maximum performance
-✅ Single-tenant dedicated servers
-✅ Rapid prototyping
+**Best for:**
+- ✅ Maximum performance
+- ✅ Single-tenant dedicated servers  
+- ✅ Rapid prototyping
 
-Direct Installation:
+### 📦 Direct Installation
+
 ```bash
 # On Ubuntu server
 pip install vllm
 python -m vllm.entrypoints.api_server --model meta-llama/Llama-2-7b-chat-hf
 ```
-Pros:
 
-    * Raw Performance: No container overhead
-    * Simpler GPU Utilization: Direct CUDA access
-    * Lower Latency: Bypasses Docker network stack
-    
-Cons:
+### ⚡ Pros
 
-    * Host pollution (dependency conflicts)
-    * Harder to maintain/rollback
-    * No built-in horizontal scaling
+- **Raw Performance**: No container overhead
+- **Simpler GPU Utilization**: Direct CUDA access
+- **Lower Latency**: Bypasses Docker network stack
+
+### ⚠️ Cons
+
+- **Host pollution** (dependency conflicts)
+- **Harder to maintain/rollback**
+- **No built-in horizontal scaling**
 
 ## Option 2: Use vLLM inside Docker for isolation
 Dockerized vLLM API server with multi-model support

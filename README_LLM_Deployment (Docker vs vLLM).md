@@ -136,8 +136,3 @@ To use:
 1. Save as `README.md` in your project root
 2. Add the `Dockerfile` and `entrypoint.sh` (if using Option C)
 3. Customize model names/ports as needed
-
-Would you like me to include any additional sections like:
-- Security hardening tips
-- Auto-scaling examples
-- Cost optimization strategies?

@@ -2,6 +2,7 @@
 
 ## Option 1: Bare Metal vLLM
 Best for:
+
 ✅ Maximum performance
 ✅ Single-tenant dedicated servers
 ✅ Rapid prototyping
